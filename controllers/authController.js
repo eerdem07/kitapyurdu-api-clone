@@ -24,8 +24,6 @@ exports.signUp = async (req, res, next) => {
 
     const token = createToken(newUser.id);
 
-    console.log(newUser.id);
-
     res.status(201).json({
       status: 'success',
       token,
@@ -43,8 +41,6 @@ exports.signUp = async (req, res, next) => {
 
 exports.login = async (req, res, next) => {
   try {
-    console.log(req.body);
-
     if (!req.body.email && !req.body.password) {
       return next(new AppError('Theres no email and password', 400));
     }
@@ -56,7 +52,7 @@ exports.login = async (req, res, next) => {
     if (!user) next(new AppError('Theres no user for this email', 400));
 
     if (user.password !== req.body.password)
-      return next(new AppError('Wrong password or email', 400));
+      next(new AppError('Wrong password or email', 400));
 
     const token = createToken(user.id);
 
@@ -73,4 +69,12 @@ exports.login = async (req, res, next) => {
       message: err,
     });
   }
+};
+
+exports.forgotPassword = async (req, res, next) => {
+  try {
+    const user = await User.find({ email: req.body.email });
+
+    if (!user) next(new AppError('Theres no user for this email'));
+  } catch (err) {}
 };
