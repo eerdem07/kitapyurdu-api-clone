@@ -3,6 +3,7 @@ const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 
 const AppError = require('../utils/appError');
+const Email = require('../utils/email');
 
 const createToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -45,9 +46,9 @@ exports.login = async (req, res, next) => {
       return next(new AppError('Theres no email and password', 400));
     }
 
-    const user = await User.find({ email: req.body.email }).select('+password');
-
-    console.log(user);
+    const user = await User.findOne({ email: req.body.email }).select(
+      '+password'
+    );
 
     if (!user) next(new AppError('Theres no user for this email', 400));
 
@@ -76,5 +77,9 @@ exports.forgotPassword = async (req, res, next) => {
     const user = await User.find({ email: req.body.email });
 
     if (!user) next(new AppError('Theres no user for this email'));
+
+    //TODO: create an token
+    //TODO: create an reset URL
+    //TODO: create and message
   } catch (err) {}
 };
