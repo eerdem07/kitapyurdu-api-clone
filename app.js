@@ -1,17 +1,23 @@
 const express = require('express');
-const app = express();
+const morgan = require('morgan');
 
 const userRouter = require('./routes/userRoutes');
 
-const AppError = require('./utils/AppError');
+const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
+
+const app = express();
 
 app.use(express.json());
 
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
+
 app.use('/api/v1/users', userRouter);
 
-app.use('*', (req, res, next) => {
-  next(new AppError(`Theres no route for this url ${req.originalUrl}`, 404));
+app.all('*', (req, res, next) => {
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 
 app.use(globalErrorHandler);
